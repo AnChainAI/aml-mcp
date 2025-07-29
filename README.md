@@ -113,11 +113,11 @@ Add to your `claude_desktop_config.json`:
       "args": [
         "run",
         "--directory",
-        "/path/to/your/aml-mcp",
+        "/path/to/your/aml-mcp",  // Required - change to your local path
         "--",
         "mcp_server.py",
-        "--ANCHAIN_APIKEY",
-        "your_api_key_here"
+        "--ANCHAIN_APIKEY", 
+        "your_api_key_here"  // Required - get your API key at https://aml.anchainai.com
       ]
     }
   }
@@ -247,7 +247,7 @@ The server handles various error conditions:
 
 ## Rate Limits
 
-Please refer to the [Anchain.ai API documentation](https://aml.anchainai.com/api) for current rate limits and pricing information.
+Please refer to the [Anchain.ai API documentation](https://aml.anchainai.com/pricing) for current rate limits and pricing information.
 
 ## Contributing
 
@@ -263,7 +263,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **Documentation**: [Anchain.ai API Docs](https://aml.anchainai.com/api)
+- **Documentation**: [Anchain.ai API Docs](https://aml.anchainai.com/docs)
 - **Issues**: [GitHub Issues](https://github.com/yourusername/mcp-aml-server/issues)
 - **API Support**: Contact Anchain.ai support
 
