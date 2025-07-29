@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "crypto_aml_mcp": {
+            "command": "uv",
+            "args": [
+                "run",
+                "--directory",
+                "/path/to/your/aml-mcp",
+                "--",
+                "mcp_server.py",
+                "--ANCHAIN_APIKEY",
+                "your_api_key_here"
+            ]
+        }
+    }
+}
