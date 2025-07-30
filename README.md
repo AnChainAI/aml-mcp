@@ -171,7 +171,7 @@ Parameters:
 Check if IP addresses originate from sanctioned countries:
 
 ```
-Check IP: 192.168.1.1
+Check IP: 37.19.90.65
 ```
 
 ## API Reference
