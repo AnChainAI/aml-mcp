@@ -108,7 +108,7 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "crypto_aml_mcp": {
+    "anchain_aml_mcp": {
       "command": "uv",
       "args": [
         "run",
