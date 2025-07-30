@@ -1,6 +1,6 @@
 {
     "mcpServers": {
-        "crypto_aml_mcp": {
+        "anchain_aml": {
             "command": "uv",
             "args": [
                 "run",
