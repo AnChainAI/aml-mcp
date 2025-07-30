@@ -1,4 +1,21 @@
-# server.py
+#!/usr/bin/env python3
+"""
+AnChain.AI MCP Server for AML Compliance and Crypto Screening
+
+Copyright (c) 2025 AnChain.AI
+Authors: Shao Liang, Victor Fang. 
+Contact: Info AT anchain.ai
+All rights reserved.
+
+This software provides MCP (Model Context Protocol) tools for AML (Anti Money Laundering):
+- Cryptocurrency address screening and risk assessment
+- Global sanctions list screening for individuals and entities  
+- IP address geolocation and sanctions compliance checking
+- More data sources coming. 
+
+For more information, visit: https://anchain.ai
+"""
+
 from fastmcp import FastMCP
 import requests
 import argparse
