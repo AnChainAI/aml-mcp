@@ -1,6 +1,6 @@
-# MCP Server For Anti Money Laundering - AnChain.Ai
+# MCP Server For Anti Money Laundering - AnChain.AI
 
-A Model Context Protocol (MCP) server that provides access to global sanctions, IP addresses and blockchain risk data through the [Anchain.ai AML API](https://aml.anchainai.com/). This server enables LLM / AI agents to screen cryptocurrency addresses, check sanctions lists, and assess IP address risks for compliance and security purposes.
+A Model Context Protocol (MCP) server that provides access to global sanctions, IP addresses and blockchain risk data through the [Anchain.ai AML API](https://aml.anchainai.com/). This server enables LLM / AI agents to screen cryptocurrency addresses, check sanctions lists, and assess IP address risks for compliance and security purposes. We welcome questions, comments, and partnership: info AT Anchain.ai 🚀
 
 ## Features
 
