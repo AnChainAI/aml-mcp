@@ -265,7 +265,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Documentation**: [Anchain.ai API Docs](https://aml.anchainai.com/docs)
 - **Issues**: [GitHub Issues](https://github.com/yourusername/mcp-aml-server/issues)
-- **API Support**: Contact Anchain.ai support
+- **API Support**: Contact Info AT Anchain.ai 
 
 ## Disclaimer
 
