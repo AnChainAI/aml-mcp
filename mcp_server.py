@@ -16,16 +16,19 @@ This software provides MCP (Model Context Protocol) tools for AML (Anti Money La
 For more information, visit: https://anchain.ai
 """
 
-from fastmcp import FastMCP
-import requests
-import argparse
 import os
 import sys
+import requests
+import argparse
+from fastmcp import FastMCP
+from fastmcp.server.dependencies import get_http_headers
+from fastmcp.exceptions import FastMCPError, ValidationError, NotFoundError
 
 # Create an MCP server
 mcp = FastMCP("anchain_aml")
 url = "https://aml.anchainai.com/api"
-apikey = None
+anchain_apikey = None
+remote = False
 
 # Add an addition tool
 @mcp.tool()
@@ -57,6 +60,7 @@ def crypto_screening(address: str, proto: str) -> dict:
         zec     Zcash
 
     """
+    apikey = check_apikey()
     res = requests.get(url=url+'/crypto_screening', params={'protocol': proto, 'address': address}, headers={
         "Authorization": f"Bearer {apikey}"
     })
@@ -82,6 +86,7 @@ def sanctions_screening(schema: str='person', scope: str='basic', name: list[str
         - Array elements within each condition are combined with OR logic
     """
 
+    apikey = check_apikey()
     payload = {
         "schema": schema,
         "scope": scope,
@@ -110,31 +115,59 @@ def ip_screening(ip_address: str) -> dict:
     Args:
         ip_address: The IP address to check (IPv4 or IPv6)
     """
+    apikey = check_apikey()
     res = requests.get(url=url+'/ip_screening', params={'ip_address': ip_address}, headers={
         "Authorization": f"Bearer {apikey}"
     })
     return res.json()
 
-
-
-def main():
-    global apikey
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-k', '--ANCHAIN_APIKEY', help="Specify apikey", type=str)
-    args = parser.parse_args()
-
-    if args.ANCHAIN_APIKEY:
-        apikey = args.ANCHAIN_APIKEY
+def check_apikey():
+    if remote:
+        apikey = get_http_headers().get("x-api-key", "")
     else:
-        apikey = os.environ.get("ANCHAIN_APIKEY")
-
+        apikey = anchain_apikey
     
     if not apikey:
-        print('ANCHAIN_APIKEY environment variable is required', file=sys.stderr, flush=True)
-        raise ValueError('ANCHAIN_APIKEY environment variable is required')
+            raise ValidationError("no anchain apikey provided")
+    return apikey
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    # Mode selection
+    parser.add_argument('--rm', '--remote', action='store_true', 
+                       help='Run in remote mode')
+
+    # http server arguments
+    remote_group = parser.add_argument_group('http server options')
+    remote_group.add_argument('--port', type=int, default=8002,
+                             help='Port for remote mcp server (default: 8002)')
+    remote_group.add_argument('--host', default='127.0.0.1',
+                             help='Host for remote mcp server (default: 127.0.0.1)')
+
+    # stdio server arguments  
+    local_group = parser.add_argument_group('stdio server options')
+    local_group.add_argument('-k', '--ANCHAIN_APIKEY', dest='apikey',
+                            help='API key for stdio server')
+
+    args = parser.parse_args()
+
+    if args.rm:
+        global remote
+        remote = True
+        mcp.run(transport="http", host=args.host, port=args.port)
+    else:
+        global anchain_apikey
+        if args.apikey:
+            anchain_apikey = args.apikey
+        else:
+            anchain_apikey = os.environ.get("ANCHAIN_APIKEY")
     
-    mcp.run()
+        if not anchain_apikey:
+            print('ANCHAIN_APIKEY environment variable is required', file=sys.stderr, flush=True)
+            raise ValueError('ANCHAIN_APIKEY environment variable is required')
+    
+        mcp.run()
 
 if __name__ == '__main__':
     main()
