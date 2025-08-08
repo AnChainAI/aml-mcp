@@ -69,7 +69,7 @@ def crypto_screening(address: str, proto: str) -> dict:
 
 # Add an addition tool
 @mcp.tool()
-def sanctions_screening(schema: str='person', scope: str='basic', name: list[str]=None, idNumber: list[str]=None, nationality: list[str]=None, birthYear: list[int]=None) -> dict:
+def sanctions_screening(schema: str='person', scope: str='basic', name: list[str]=None, idNumber: list[str]=None, nationality: list[str]=None, birthYear: list[str]=None) -> dict:
     """Check individuals or entities against global sanctions lists.
 
     Args:
@@ -78,7 +78,7 @@ def sanctions_screening(schema: str='person', scope: str='basic', name: list[str
         name: Full name(s) to screen (e.g. ["John Doe"])
         idNumber: Government ID or passport number(s) (e.g. ["A12345678"])
         nationality: 2-letter country code(s) (ISO 3166-1, e.g. ["us", "au"])
-        birthYear: Birth year(s) (1000-9999, e.g. [1980, 1975])
+        birthYear: Birth year(s) in string (1000-9999, e.g. ["1980", "1975"])
 
     Note:
         - All query parameters are optional but at least one must be provided
