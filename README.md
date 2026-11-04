@@ -185,7 +185,7 @@ A typical stdio client configuration looks like this (the exact format depends o
 
 ## Usage
 
-Once configured, the server provides three main functions:
+Once configured, the server provides eight tools (see the [API Reference](#api-reference)). The three main ones are:
 
 ### 1. Cryptocurrency Address Screening
 
@@ -223,12 +223,12 @@ Check IP: 37.19.90.65
 
 ### Functions
 
-#### `crypto_screening(address, proto)`
+#### `crypto_screening(address, protocol)`
 Screen cryptocurrency addresses for risk factors.
 
 **Parameters:**
 - `address` (string): Crypto address to screen
-- `proto` (string): 3-letter blockchain protocol code
+- `protocol` (string): 3-letter blockchain protocol code
 
 **Returns:** Risk assessment including sanctions matches, risk scores, and compliance flags.
 
@@ -252,6 +252,54 @@ Check IP address country origin against sanctions lists.
 - `ip_address` (string): IPv4 or IPv6 address to check
 
 **Returns:** Country information and sanctions status.
+
+#### `crypto_activity_screening(address, protocol)`
+Analyze a cryptocurrency address for suspicious activity.
+
+**Parameters:**
+- `address` (string): Crypto address to analyze
+- `protocol` (string): 3-letter blockchain protocol code
+
+#### `crypto_attribution_screening(address, protocol)`
+Attribute the transaction flows of a cryptocurrency address. Requires a pro plan API key.
+
+**Parameters:**
+- `address` (string): Crypto address to analyze
+- `protocol` (string): 3-letter blockchain protocol code
+
+#### `auto_trace(protocol, time_from, time_to, address?, txn_hash?, direction?, time_window?, min_amount?, max_amount?, token?)`
+Trace the flow of assets into or out of an address or transaction.
+
+**Parameters:**
+- `protocol` (string): One of `btc`, `eth`, `xrp`, `egld`, `trx`
+- `time_from` (integer): Start of the trace, as a Unix timestamp
+- `time_to` (integer): End of the trace, as a Unix timestamp
+- `address` (string): Address to trace (required if `txn_hash` is not given)
+- `txn_hash` (string): Transaction hash to trace (required if `address` is not given)
+- `direction` (string): `"in"` for incoming or `"out"` for outgoing (default: `"in"`)
+- `time_window` (integer): Days to include around the transaction time (default: 365)
+- `min_amount` (integer): Minimum transaction amount to include (default: 0)
+- `max_amount` (integer): Maximum transaction amount to include
+- `token` (string): Token contract address to trace, on EVM chains
+
+**Returns:** `path_info` (the traced transactions, each with depth, hash, sender, receiver, timestamp and amount), plus `token_mapping` and `labels_mapping` for resolving token and known-entity addresses.
+
+#### `get_source_code(address, protocol)`
+Get a smart contract's source code, if available.
+
+**Parameters:**
+- `address` (string): Smart contract address
+- `protocol` (string): `eth` or `bnb`
+
+#### `get_transaction(transaction_hash, protocol, scope?)`
+Get the data for a transaction.
+
+**Parameters:**
+- `transaction_hash` (string): Transaction hash
+- `protocol` (string): `eth` or `bnb`
+- `scope` (string): `"summary"` for a summarized analysis, or `"full"` for the full execution flow (default: `"summary"`). Full scope can return a very large response.
+
+**Returns:** With `summary`: overview, token and address mappings, balance changes, the transaction graph and a summary of key events. With `full`: the call-by-call execution flow.
 
 ## Examples
 
