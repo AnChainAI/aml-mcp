@@ -103,7 +103,12 @@ Add the server to your MCP client configuration:
 
 #### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+Add the following to your `claude_desktop_config.json`. Two values are required:
+
+- Replace `/path/to/your/aml-mcp` with the absolute path to your local clone of this repository.
+- Replace `your_api_key_here` with your API key from [aml.anchainai.com](https://aml.anchainai.com).
+
+JSON does not allow comments, so keep the file free of `//` or `#` notes.
 
 ```json
 {
@@ -113,12 +118,36 @@ Add to your `claude_desktop_config.json`:
       "args": [
         "run",
         "--directory",
-        "/path/to/your/aml-mcp",  // Required - change to your local path
+        "/path/to/your/aml-mcp",
         "--",
         "mcp_server.py",
-        "--ANCHAIN_APIKEY", 
-        "your_api_key_here"  // Required - get your API key at https://aml.anchainai.com
+        "--ANCHAIN_APIKEY",
+        "your_api_key_here"
       ]
+    }
+  }
+}
+```
+
+##### Alternative: API key from an environment variable
+
+If the `--ANCHAIN_APIKEY` argument is not passed, `mcp_server.py` reads the key from the `ANCHAIN_APIKEY` environment variable. This keeps the key out of the `args` list:
+
+```json
+{
+  "mcpServers": {
+    "anchain_aml_mcp": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/path/to/your/aml-mcp",
+        "--",
+        "mcp_server.py"
+      ],
+      "env": {
+        "ANCHAIN_APIKEY": "your_api_key_here"
+      }
     }
   }
 }
@@ -126,14 +155,30 @@ Add to your `claude_desktop_config.json`:
 
 #### Other MCP Clients
 
-For other MCP clients, use the stdio transport:
+For other MCP clients, use the stdio transport and start the server with `uv run`:
+
+```bash
+uv run --directory /path/to/your/aml-mcp -- mcp_server.py --ANCHAIN_APIKEY your_api_key_here
+```
+
+Or, with the key in the `ANCHAIN_APIKEY` environment variable:
+
+```bash
+uv run --directory /path/to/your/aml-mcp -- mcp_server.py
+```
+
+A typical stdio client configuration looks like this (the exact format depends on your client):
 
 ```json
 {
   "name": "aml",
   "transport": {
     "type": "stdio",
-    "command": "mcp-aml-server"
+    "command": "uv",
+    "args": ["run", "--directory", "/path/to/your/aml-mcp", "--", "mcp_server.py"],
+    "env": {
+      "ANCHAIN_APIKEY": "your_api_key_here"
+    }
   }
 }
 ```
@@ -210,30 +255,68 @@ Check IP address country origin against sanctions lists.
 
 ## Examples
 
+In an MCP client such as Claude Desktop, you call these tools by asking in plain language. The assistant picks the right tool and parameters.
+
 ### Address Risk Assessment
-```javascript
-// Screen a Bitcoin address
-const result = await crypto_screening(
-  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", 
-  "btc"
-);
-```
+
+> Screen the Bitcoin address bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh and summarize its risk.
 
 ### Sanctions Screening
-```javascript
-// Check multiple individuals
-const result = await sanctions_screening({
-  schema: "person",
-  name: ["John Doe", "Jane Smith"],
-  nationality: ["us", "ca"],
-  scope: "basic"
-});
-```
+
+> Check John Doe and Jane Smith against sanctions lists. They are persons with US or Canadian nationality. Use the basic scope.
 
 ### IP Geolocation Check
-```javascript
-// Check IP origin
-const result = await ip_screening("8.8.8.8");
+
+> Does the IP address 8.8.8.8 come from a sanctioned country?
+
+### Python Example
+
+You can also call the tools from Python with the [FastMCP](https://gofastmcp.com) client, which is already a dependency of this project. Set `ANCHAIN_APIKEY` in your environment first.
+
+```python
+import asyncio
+import os
+
+from fastmcp import Client
+
+config = {
+    "mcpServers": {
+        "anchain_aml": {
+            "command": "uv",
+            "args": ["run", "--directory", "/path/to/your/aml-mcp", "--", "mcp_server.py"],
+            "env": {"ANCHAIN_APIKEY": os.environ["ANCHAIN_APIKEY"]},
+        }
+    }
+}
+
+
+async def main():
+    async with Client(config) as client:
+        # Screen a Bitcoin address
+        address = await client.call_tool(
+            "crypto_screening",
+            {"address": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", "protocol": "btc"},
+        )
+        print(address.data)
+
+        # Check multiple individuals against sanctions lists
+        sanctions = await client.call_tool(
+            "sanctions_screening",
+            {
+                "schema": "person",
+                "name": ["John Doe", "Jane Smith"],
+                "nationality": ["us", "ca"],
+                "scope": "basic",
+            },
+        )
+        print(sanctions.data)
+
+        # Check where an IP address comes from
+        ip = await client.call_tool("ip_screening", {"ip_address": "8.8.8.8"})
+        print(ip.data)
+
+
+asyncio.run(main())
 ```
 
 ## Error Handling
@@ -244,6 +327,8 @@ The server handles various error conditions:
 - Malformed addresses or parameters
 - Rate limiting
 - Network connectivity issues
+
+For common problems and fixes, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Rate Limits
 
